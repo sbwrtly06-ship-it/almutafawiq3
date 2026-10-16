@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'welcome.dart';
+import 'home_dashboard.dart';
 
 void main() {
   runApp(const AlMutafawiqApp());
@@ -14,11 +14,10 @@ class AlMutafawiqApp extends StatelessWidget {
       title: 'المتفوق',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: 'Cairo', // الخط العربي العام
         primarySwatch: Colors.indigo,
-        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+        scaffoldBackgroundColor: const Color(0xFF0F172A),
       ),
-      home: const WelcomeScreen(),
+      home: const HomeDashboardScreen(),
     );
   }
 }
