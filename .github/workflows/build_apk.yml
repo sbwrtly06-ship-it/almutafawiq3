@@ -23,6 +23,10 @@ jobs:
       with:
         channel: 'stable'
 
+    - name: Create Clean Flutter Project Structure
+      run: |
+        flutter create . --org com.almutafawiq.app --project-name almutafawiq --overwrite
+
     - name: Get dependencies
       run: flutter pub get
 
