@@ -23,9 +23,36 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Create Clean Flutter Project Structure
+    - name: Generate Base Project
+      run: flutter create . --org com.almutafawiq.app --project-name almutafawiq --overwrite
+
+    - name: Force Real Main and UI Files
       run: |
-        flutter create . --org com.almutafawiq.app --project-name almutafawiq --overwrite
+        cat << 'EOL' > lib/main.dart
+        import 'package:flutter/material.dart';
+        import 'home_dashboard.dart';
+
+        void main() {
+          runApp(const AlMutafawiqApp());
+        }
+
+        class AlMutafawiqApp extends StatelessWidget {
+          const AlMutafawiqApp({Key? key}) : super(key: key);
+
+          @override
+          Widget build(BuildContext context) {
+            return MaterialApp(
+              title: 'المتفوق',
+              debugShowCheckedModeBanner: false,
+              theme: ThemeData(
+                primarySwatch: Colors.indigo,
+                scaffoldBackgroundColor: const Color(0xFF0F172A),
+              ),
+              home: const HomeDashboardScreen(),
+            );
+          }
+        }
+        EOL
 
     - name: Get dependencies
       run: flutter pub get
