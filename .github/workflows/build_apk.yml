@@ -3,8 +3,6 @@ name: Build Android APK
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   build:
@@ -24,6 +22,10 @@ jobs:
       uses: subosito/flutter-action@v2
       with:
         channel: 'stable'
+
+    - name: Generate Android Template (Fix Structure)
+      run: |
+        flutter create . --org com.almutafawiq.app --project-name almutafawiq --overwrite
 
     - name: Get dependencies
       run: flutter pub get
