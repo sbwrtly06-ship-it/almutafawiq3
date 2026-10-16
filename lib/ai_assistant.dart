@@ -1,31 +1,41 @@
 import 'package:flutter/material.dart';
 
-class AiAssistantScreen extends StatefulWidget {
-  const AiAssistantScreen({Key? key}) : super(key: key);
+class AIAssistantScreen extends StatefulWidget {
+  const AIAssistantScreen({Key? key}) : super(key: key);
 
   @override
-  State<AiAssistantScreen> createState() => _AiAssistantScreenState();
+  _AIAssistantScreenState createState() => _AIAssistantScreenState();
 }
 
-class _AiAssistantScreenState extends State<AiAssistantScreen> {
+class _AIAssistantScreenState extends State<AIAssistantScreen> {
   final TextEditingController _controller = TextEditingController();
   final List<Map<String, String>> _messages = [
-    {"sender": "ai", "text": "أهلاً بك يا بطل! أنا مساعدك الذكي في تطبيق المتفوق. كيف يمكنني مساعدتك في دراستك اليوم؟ 🤖📚"}
+    {
+      'role': 'ai',
+      'text': 'أهلاً بك أيها المتفوق. أنا مساعدك الذكي المتخصص في الإجابة على الأسئلة الدراسية والعلمية فقط. كيف يمكنني مساعدتك في تحصيلك العلمي اليوم؟'
+    }
   ];
 
   void _sendMessage() {
-    if (_controller.text.trim().isEmpty) return;
+    String text = _controller.text.trim();
+    if (text.isEmpty) return;
 
-    String userMessage = _controller.text;
     setState(() {
-      _messages.add({"sender": "user", "text": userMessage});
-      // محاكاة رد الذكاء الاصطناعي (يمكن ربطه بـ API لاحقاً)
-      _messages.add({
-        "sender": "ai", 
-        "text": "سؤال ممتاز حول '$userMessage'! استمر في التركيز، أنصحك بتقسيم هذه الفكرة إلى خطوات صغيرة لتفهمها بشكل أفضل."
-      });
+      _messages.add({'role': 'user', 'text': text});
+      _controller.clear();
+
+      // محاكاة الرد الذكي والدقيق للأسئلة العلمية فقط
+      String aiResponse = _processAcademicQuery(text);
+      _messages.add({'role': 'ai', 'text': aiResponse});
     });
-    _controller.clear();
+  }
+
+  String _processAcademicQuery(String query) {
+    // تصفية المحتوى لضمان التركيز على الأسئلة المفيدة فقط
+    if (query.contains('لعبة') || query.contains('نكتة') || query.contains('تسالي') || query.length < 3) {
+      return 'عذراً، أنا مساعد أكاديمي مخصص حصرياً للإجابة على الأسئلة العلمية، الدراسية، وخطط الإنتاجية فقط. تفضل بسؤالي عن أي مسألة أو موضوع دراسي.';
+    }
+    return 'سؤال ممتاز! بناءً على المعطيات العلمية لـ "$query"، فإن الإجابة الدقيقة تعتمد على فهم المفاهيم الأساسية وتطبيقها بتركيز. هل تريد تفصيل هذه القاعدة أو حل مسألة مشابهة عليها؟';
   }
 
   @override
@@ -33,10 +43,9 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
+        title: const Text('مساعد الذكاء الاصطناعي الأكاديمي', style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF1E293B),
-        elevation: 0,
-        title: const Text('مساعد الذكاء الاصطناعي', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Column(
         children: [
@@ -45,20 +54,19 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
               padding: const EdgeInsets.all(16),
               itemCount: _messages.length,
               itemBuilder: (context, index) {
-                bool isAi = _messages[index]["sender"] == "ai";
+                bool isUser = _messages[index]['role'] == 'user';
                 return Align(
-                  alignment: isAi ? Alignment.centerLeft : Alignment.centerRight,
+                  alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
                   child: Container(
                     margin: const EdgeInsets.symmetric(vertical: 6),
                     padding: const EdgeInsets.all(12),
-                    constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
                     decoration: BoxDecoration(
-                      color: isAi ? const Color(0xFF1E293B) : const Color(0xFF6366F1),
-                      borderRadius: BorderRadius.circular(16),
+                      color: isUser ? Colors.indigoAccent : const Color(0xFF334155),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      _messages[index]["text"]!,
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      _messages[index]['text']!,
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
                 );
@@ -66,7 +74,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
             ),
           ),
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(8),
             color: const Color(0xFF1E293B),
             child: Row(
               children: [
@@ -75,14 +83,14 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                     controller: _controller,
                     style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
-                      hintText: 'اسأل مساعد الذكاء الاصطناعي سؤالاً دراسياً...',
-                      hintStyle: TextStyle(color: Colors.white60),
+                      hintText: 'اكتب سؤالك الدراسي هنا...',
+                      hintStyle: TextStyle(color: Colors.grey),
                       border: InputBorder.none,
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.send, color: Color(0xFF6366F1)),
+                  icon: const Icon(Icons.send, color: Colors.indigoAccent),
                   onPressed: _sendMessage,
                 ),
               ],
