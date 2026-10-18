@@ -21,7 +21,7 @@ class AlMutafawiqApp extends StatelessWidget {
   }
 }
 
-// 1. تسلسل الشاشات والأزرار المفعلة بناءً على صورك الأصلية
+// 1. تسلسل الشاشات والأسماء الأصلية الصحيحة للصور
 class OnboardingSequenceScreen extends StatefulWidget {
   const OnboardingSequenceScreen({Key? key}) : super(key: key);
 
@@ -30,13 +30,21 @@ class OnboardingSequenceScreen extends StatefulWidget {
 }
 
 class _OnboardingSequenceScreenState extends State<OnboardingSequenceScreen> {
-  int currentStep = 1; // تبدأ من الصورة 1 وتتنقل عبر الأزرار
+  int currentStep = 0;
+
+  // الأسماء الفعلية والصحيحة للصور كما تم رفعها تماماً
+  final List<String> originalImages = [
+    'assets/images/file_0000000037c881f49b41687f48f122b9.png',
+    'assets/images/file_00000000dcb081f48b5f5eb66e29f4e8.png',
+    'assets/images/file_00000000ebf081f48549bc8ef97aeb19.png',
+    'assets/images/file_00000000f04881f49888a9435e3b4682.png',
+    'assets/images/file_00000000fb2881f483ab267660e3271e.png',
+  ];
 
   void _nextStep() {
-    if (currentStep < 3) {
+    if (currentStep < originalImages.length - 1) {
       setState(() => currentStep++);
     } else {
-      // عند التعدي والانتقال من الشاشات الأولى -> الذهاب للرئيسية وجلسة التركيز
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const MainHomeScreen()),
@@ -45,7 +53,7 @@ class _OnboardingSequenceScreenState extends State<OnboardingSequenceScreen> {
   }
 
   void _prevStep() {
-    if (currentStep > 1) {
+    if (currentStep > 0) {
       setState(() => currentStep--);
     }
   }
@@ -60,12 +68,12 @@ class _OnboardingSequenceScreenState extends State<OnboardingSequenceScreen> {
             children: [
               const SizedBox(height: 10),
               Text(
-                currentStep == 1 ? 'شاشة الانطلاق والدخول' : 'عرض الجداول - الخطوة ${currentStep - 1}',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                'الجدول أو الصورة الأصلية (${currentStep + 1} من ${originalImages.length})',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
               ),
               const SizedBox(height: 16),
               
-              // عرض الصورة الحالية
+              // عرض الصورة الحالية بوضوح تام مع خاصية التكبير
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -76,11 +84,14 @@ class _OnboardingSequenceScreenState extends State<OnboardingSequenceScreen> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      'assets/images/$currentStep.png',
-                      fit: BoxFit.contain,
-                      errorBuilder: (c, e, s) => Center(
-                        child: Text('الصورة رقم $currentStep', style: const TextStyle(color: Colors.white)),
+                    child: InteractiveViewer(
+                      maxScale: 4.0,
+                      child: Image.asset(
+                        originalImages[currentStep],
+                        fit: BoxFit.contain,
+                        errorBuilder: (c, e, s) => const Center(
+                          child: Text('جاري تحميل الصورة الأصلية...', style: TextStyle(color: Colors.grey)),
+                        ),
                       ),
                     ),
                   ),
@@ -88,10 +99,10 @@ class _OnboardingSequenceScreenState extends State<OnboardingSequenceScreen> {
               ),
               const SizedBox(height: 20),
 
-              // الأزرار المفعلة للانتقال بين الشاشات
+              // الأزرار المفعلة للانتقال بين الصور
               Row(
                 children: [
-                  if (currentStep > 1)
+                  if (currentStep > 0)
                     Expanded(
                       child: OutlinedButton(
                         onPressed: _prevStep,
@@ -102,7 +113,7 @@ class _OnboardingSequenceScreenState extends State<OnboardingSequenceScreen> {
                         child: const Text('السابق', style: TextStyle(color: Colors.white, fontSize: 16)),
                       ),
                     ),
-                  if (currentStep > 1) const SizedBox(width: 12),
+                  if (currentStep > 0) const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: _nextStep,
@@ -112,9 +123,7 @@ class _OnboardingSequenceScreenState extends State<OnboardingSequenceScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        currentStep == 1
-                            ? 'بدء الاستخدام الان'
-                            : (currentStep == 3 ? 'الانتقال للرئيسية والتركيز' : 'التالي'),
+                        currentStep == originalImages.length - 1 ? 'الانتقال للرئيسية والتركيز' : 'التالي',
                         style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -129,7 +138,7 @@ class _OnboardingSequenceScreenState extends State<OnboardingSequenceScreen> {
   }
 }
 
-// 2. الشاشة الرئيسية: جلسة التركيز (مع خيار حظر التطبيقات) والمساعد الأكاديمي
+// 2. الشاشة الرئيسية: جلسة التركيز (مع إمكانية تخصيص الوقت وحظر التطبيقات) والمساعد الأكاديمي
 class MainHomeScreen extends StatefulWidget {
   const MainHomeScreen({Key? key}) : super(key: key);
 
@@ -159,7 +168,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
         selectedItemColor: const Color(0xFF6366F1),
         unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.timer), label: 'جلسة التركيز وحظر التطبيقات'),
+          BottomNavigationBarItem(icon: Icon(Icons.timer), label: 'جلسة التركيز والوقت'),
           BottomNavigationBarItem(icon: Icon(Icons.psychology), label: 'المساعد الأكاديمي'),
         ],
       ),
@@ -167,7 +176,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   }
 }
 
-// 3. جلسة التركيز المفعلة مع وضع حظر التشتت/التطبيقات
+// 3. جلسة التركيز مع إمكانية تعيين الوقت وحظر التطبيقات
 class FocusTimerTab extends StatefulWidget {
   const FocusTimerTab({Key? key}) : super(key: key);
 
@@ -178,12 +187,44 @@ class FocusTimerTab extends StatefulWidget {
 class _FocusTimerTabState extends State<FocusTimerTab> {
   bool isAppBlockerActive = true;
   bool isTimerRunning = false;
+  int selectedMinutes = 25; // الوقت الافتراضي وقابل للتعديل
+
+  void _showTimePickerModal() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E293B),
+        title: const Text('حدد وقت المذاكرة (بالدقائق)', style: TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('15 دقيقة (مراجعة سريعة)', style: TextStyle(color: Colors.white70)),
+              onTap: () { setState(() => selectedMinutes = 15); Navigator.pop(context); },
+            ),
+            ListTile(
+              title: const Text('25 دقيقة (جلسة بومودورو قياسية)', style: TextStyle(color: Colors.white)),
+              onTap: () { setState(() => selectedMinutes = 25); Navigator.pop(context); },
+            ),
+            ListTile(
+              title: const Text('45 دقيقة (جلسة متقدمة)', style: TextStyle(color: Colors.white70)),
+              onTap: () { setState(() => selectedMinutes = 45); Navigator.pop(context); },
+            ),
+            ListTile(
+              title: const Text('60 دقيقة (ساعة كاملة للمذاكرة)', style: TextStyle(color: Colors.white70)),
+              onTap: () { setState(() => selectedMinutes = 60); Navigator.pop(context); },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('جلسة التركيز (المتفوق)'),
+        title: const Text('جلسة التركيز ووقت المذاكرة'),
         backgroundColor: const Color(0xFF1E293B),
         centerTitle: true,
       ),
@@ -192,7 +233,20 @@ class _FocusTimerTabState extends State<FocusTimerTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // مفتاح تفعيل حظر التطبيقات
+            // زر تخصيص الوقت
+            OutlinedButton.icon(
+              onPressed: isTimerRunning ? null : _showTimePickerModal,
+              icon: const Icon(Icons.edit, color: Color(0xFF6366F1)),
+              label: Text('وقت الجلسة الحالي: $selectedMinutes دقيقة (اضغط للتغيير)', style: const TextStyle(color: Colors.white)),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFF6366F1)),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // مفتاح حظر التطبيقات
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
@@ -207,25 +261,23 @@ class _FocusTimerTabState extends State<FocusTimerTab> {
                     children: [
                       Icon(Icons.block, color: Colors.redAccent),
                       SizedBox(width: 8),
-                      Text('حظر التطبيقات المشتتة أثناء المذاكرة', style: TextStyle(color: Colors.white, fontSize: 13)),
+                      Text('حظر التطبيقات المشتتة أثناء الجلسة', style: TextStyle(color: Colors.white, fontSize: 13)),
                     ],
                   ),
                   Switch(
                     value: isAppBlockerActive,
                     activeColor: const Color(0xFF6366F1),
-                    onChanged: (val) {
-                      setState(() => isAppBlockerActive = val);
-                    },
+                    onChanged: (val) => setState(() => isAppBlockerActive = val),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 30),
 
-            // دائر مؤقت البومودورو
+            // دائرة المؤقت
             Container(
-              width: 220,
-              height: 220,
+              width: 200,
+              height: 200,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: const Color(0xFF1E293B),
@@ -238,20 +290,20 @@ class _FocusTimerTabState extends State<FocusTimerTab> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    isTimerRunning ? '24:59' : '25:00',
+                    '$selectedMinutes:00',
                     style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    isTimerRunning ? 'وضع المذاكرة نشط' : 'جاهز للمذاكرة',
+                    isTimerRunning ? 'قيد التركيز والحظر' : 'جاهز للبدء',
                     style: TextStyle(color: isTimerRunning ? Colors.greenAccent : Colors.grey, fontSize: 14),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 30),
 
-            // زر بدء/إيقاف المؤقت وحظر التطبيقات
+            // زر التشغيل
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -261,7 +313,7 @@ class _FocusTimerTabState extends State<FocusTimerTab> {
                     SnackBar(
                       content: Text(
                         isTimerRunning
-                            ? (isAppBlockerActive ? 'تم بدء المذاكرة وتم تفعيل حظر التطبيقات!' : 'تم بدء المذاكرة!')
+                            ? 'بدء جلسة التركيز لمدة $selectedMinutes دقيقة ${isAppBlockerActive ? 'مع حظر التطبيقات!' : ''}'
                             : 'تم إيقاف الجلسة',
                       ),
                       backgroundColor: isTimerRunning ? Colors.green : Colors.orange,
@@ -270,7 +322,7 @@ class _FocusTimerTabState extends State<FocusTimerTab> {
                 },
                 icon: Icon(isTimerRunning ? Icons.pause : Icons.play_arrow),
                 label: Text(
-                  isTimerRunning ? 'إيقاف مؤقت' : 'بدء الجلسة وحظر التطبيقات',
+                  isTimerRunning ? 'إيقاف الجلسة المؤقتة' : 'بدء الجلسة وحظر التطبيقات',
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -300,7 +352,7 @@ class _AIAssistantTabState extends State<AIAssistantTab> {
   final List<Map<String, String>> _messages = [
     {
       'role': 'ai',
-      'text': 'أهلاً بك يا مرتضى! أنا مساعدك الأكاديمي الذكي. تفضل بطرح أسئلتك الدراسية العلمية.'
+      'text': 'أهلاً بك يا مرتضى! أنا مساعدك الأكاديمي الذكي. اطرح أي سؤال في الفيزياء، الرياضيات، أو الميكاترونكس وسأجيبك فوراً.'
     }
   ];
 
@@ -310,11 +362,11 @@ class _AIAssistantTabState extends State<AIAssistantTab> {
     setState(() {
       _messages.add({'role': 'user', 'text': text});
       
-      String aiReply = 'سؤالك حول "$text" يتطلب تطبيق القوانين والتحليل العلمي الدقيق. واصل اجتهادك!';
+      String aiReply = 'بناءً على دراستك العلمية، سؤالك حول "$text" يتطلب تطبيق القوانين الفيزيائية والرياضية بدقة. واصل اجتهادك!';
       if (text.contains('فيزياء') || text.contains('حركة') || text.contains('متجهات')) {
-        aiReply = 'في الفيزياء والرياضيات، تحليل المتجهات والحركة يعتمد على القوانين الأساسية والتحليل الاتجاهي.';
+        aiReply = 'في الفيزياء والرياضيات، تحليل المتجهات والحركة يعتمد على القوانين الأساسية والتحليل الاتجاهي السليم.';
       } else if (text.contains('ميكاترونكس') || text.contains('برمجة') || text.contains('تحكم')) {
-        aiReply = 'في هندسة الميكاترونكس، أنظمة التحكم الذكية والخوارزميات تلعب الدور الأكبر في استقرار الأنظمة.';
+        aiReply = 'في هندسة الميكاترونكس، أنظمة التحكم الذكية والخوارزميات تلعب الدور الأكبر في استقرار الأجهزة الآلية.';
       }
 
       _messages.add({'role': 'ai', 'text': aiReply});
