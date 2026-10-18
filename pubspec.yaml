@@ -1,5 +1,5 @@
-name: almutafawiq
-description: "تطبيق المتفوق لمساعدة الطلاب على التركيز والإنتاجية"
+name: almutafawiq3
+description: "تطبيق المتفوق الأكاديمي"
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -9,12 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.2
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^2.0.0
+  shared_preferences: ^2.2.2
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/

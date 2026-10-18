@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const AlMutafawiqApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final bool isFirstTime = prefs.getBool('is_first_time') ?? true;
+  runApp(AlMutafawiqApp(isFirstTime: isFirstTime));
 }
 
 class AlMutafawiqApp extends StatelessWidget {
-  const AlMutafawiqApp({Key? key}) : super(key: key);
+  final bool isFirstTime;
+  const AlMutafawiqApp({Key? key, required this.isFirstTime}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +21,69 @@ class AlMutafawiqApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFF0F172A),
         primaryColor: const Color(0xFF6366F1),
       ),
-      home: const MainHomeScreen(),
+      home: isFirstTime ? const OnboardingScreen() : const MainHomeScreen(),
     );
   }
 }
 
+// 1. شاشة تسجيل الدخول / الترحيب الأولى (تظهر لأول مرة فقط)
+class OnboardingScreen extends StatelessWidget {
+  const OnboardingScreen({Key? key}) : super(key: key);
+
+  Future<void> _finishOnboarding(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('is_first_time', false);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const MainHomeScreen()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.school, size: 100, color: Color(0xFF6366F1)),
+              const SizedBox(height: 24),
+              const Text(
+                'أهلاً بك في تطبيق المتفوق',
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'مساعدك الأكاديمي الشامل لجداول المذاكرة، جلسات التركيز، والمراجعة الذكية.',
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 48),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => _finishOnboarding(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6366F1),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text('ابدأ الانطلاق', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// الشاشة الرئيسية مع التنقل السفلي المنظم
 class MainHomeScreen extends StatefulWidget {
   const MainHomeScreen({Key? key}) : super(key: key);
 
@@ -51,7 +114,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
         selectedItemColor: const Color(0xFF6366F1),
         unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'الرئيسية'),
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'الرئيسية والجداول'),
           BottomNavigationBarItem(icon: Icon(Icons.timer), label: 'جلسة التركيز'),
           BottomNavigationBarItem(icon: Icon(Icons.psychology), label: 'المساعد الأكاديمي'),
         ],
@@ -60,6 +123,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   }
 }
 
+// 2. لوحة التحكم الرئيسية وعرض الصور والجداول الأصلية بدقة
 class DashboardTab extends StatelessWidget {
   const DashboardTab({Key? key}) : super(key: key);
 
@@ -75,7 +139,7 @@ class DashboardTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('لوحة المتفوق الأكاديمية'),
+        title: const Text('لوحة المتفوق الأكاديمية وجداول المذاكرة'),
         centerTitle: true,
         backgroundColor: const Color(0xFF1E293B),
         elevation: 0,
@@ -96,34 +160,17 @@ class DashboardTab extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Row(
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text('أهلاً بك في منصة المتفوق 👋', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-                        SizedBox(height: 8),
-                        Text('مساعدك المباشر للتفوق الدراسي والمراجعة المنهجية.', style: TextStyle(color: Colors.white70, fontSize: 13)),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      myImages[0],
-                      width: 60,
-                      height: 60,
-                      fit: BoxFit.cover,
-                      errorBuilder: (c, e, s) => const Icon(Icons.school, size: 50, color: Colors.white),
-                    ),
-                  ),
+                  Text('أهلاً بك يا مرتضى 👋', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                  SizedBox(height: 8),
+                  Text('إليك جداولك الدراسية الأصلية وصورك المعتمدة للمراجعة.', style: TextStyle(color: Colors.white70, fontSize: 13)),
                 ],
               ),
             ),
             const SizedBox(height: 24),
-            const Text('الجداول والصور الأصلية', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+            const Text('جداول المذاكرة والصور الأصلية', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
             const SizedBox(height: 12),
             ListView.builder(
               shrinkWrap: true,
@@ -144,7 +191,7 @@ class DashboardTab extends StatelessWidget {
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) => const Padding(
                         padding: EdgeInsets.all(20.0),
-                        child: Center(child: Text('جاري عرض الصورة...', style: TextStyle(color: Colors.grey))),
+                        child: Center(child: Text('تعذر تحميل الصورة، تحقق من المسار', style: TextStyle(color: Colors.grey))),
                       ),
                     ),
                   ),
@@ -158,13 +205,14 @@ class DashboardTab extends StatelessWidget {
   }
 }
 
+// 3. جلسة التركيز (البومودورو)
 class FocusTimerTab extends StatelessWidget {
   const FocusTimerTab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('جلسة التركيز (بومودورو)'), backgroundColor: const Color(0xFF1E293B), centerTitle: true),
+      appBar: AppBar(title: const Text('جلسة التركيز الدراسية'), backgroundColor: const Color(0xFF1E293B), centerTitle: true),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -181,12 +229,12 @@ class FocusTimerTab extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            const Text('جلسة مذاكرة مركزة', style: TextStyle(color: Colors.grey, fontSize: 16)),
+            const Text('وقت المذاكرة المركز والممنهج', style: TextStyle(color: Colors.grey, fontSize: 16)),
             const SizedBox(height: 32),
             ElevatedButton.icon(
               onPressed: () {},
               icon: const Icon(Icons.play_arrow),
-              label: const Text('بدء الجلسة'),
+              label: const Text('بدء الجلسة الآن'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF6366F1),
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
@@ -200,6 +248,7 @@ class FocusTimerTab extends StatelessWidget {
   }
 }
 
+// 4. المساعد الأكاديمي (محادثة الذكاء الاصطناعي)
 class AIAssistantTab extends StatefulWidget {
   const AIAssistantTab({Key? key}) : super(key: key);
 
@@ -210,7 +259,7 @@ class AIAssistantTab extends StatefulWidget {
 class _AIAssistantTabState extends State<AIAssistantTab> {
   final TextEditingController _controller = TextEditingController();
   final List<Map<String, String>> _messages = [
-    {'role': 'ai', 'text': 'مرحباً بك! أنا مساعد المتفوق الأكاديمي. تفضل بطرح أسئلتك العلمية والدراسية.'}
+    {'role': 'ai', 'text': 'أهلاً بك! أنا مساعدك الأكاديمي الذكي. اطرح أي سؤال علمي أو استفسار دراسي وسأساعدك فوراً.'}
   ];
 
   void _sendMessage() {
@@ -218,7 +267,7 @@ class _AIAssistantTabState extends State<AIAssistantTab> {
     final text = _controller.text;
     setState(() {
       _messages.add({'role': 'user', 'text': text});
-      _messages.add({'role': 'ai', 'text': 'تم استلام سؤالك الأكاديمي: "$text". جارٍ تحليل المسألة وتقديم الشرح العلمي الدقيق.'});
+      _messages.add({'role': 'ai', 'text': 'تم استلام استفسارك: "$text". جارٍ إعداد الشرح العلمي والدقيق لك.'});
       _controller.clear();
     });
   }
@@ -226,7 +275,7 @@ class _AIAssistantTabState extends State<AIAssistantTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('المساعد الذكي للأبحاث والفيزياء'), backgroundColor: const Color(0xFF1E293B), centerTitle: true),
+      appBar: AppBar(title: const Text('المساعد الأكاديمي والذكاء الاصطناعي'), backgroundColor: const Color(0xFF1E293B), centerTitle: true),
       body: Column(
         children: [
           Expanded(
@@ -260,7 +309,7 @@ class _AIAssistantTabState extends State<AIAssistantTab> {
                     controller: _controller,
                     style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
-                      hintText: 'اكتب سؤالك الأكاديمي هنا...',
+                      hintText: 'اسأل المساعد الأكاديمي...',
                       hintStyle: TextStyle(color: Colors.grey),
                       border: InputBorder.none,
                     ),
