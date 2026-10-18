@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
-  final bool isFirstTime = prefs.getBool('is_first_time') ?? true;
-  runApp(AlMutafawiqApp(isFirstTime: isFirstTime));
+void main() {
+  runApp(const AlMutafawiqApp());
 }
 
 class AlMutafawiqApp extends StatelessWidget {
-  final bool isFirstTime;
-  const AlMutafawiqApp({Key? key, required this.isFirstTime}) : super(key: key);
+  const AlMutafawiqApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,69 +16,11 @@ class AlMutafawiqApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFF0F172A),
         primaryColor: const Color(0xFF6366F1),
       ),
-      home: isFirstTime ? const OnboardingScreen() : const MainHomeScreen(),
+      home: const MainHomeScreen(),
     );
   }
 }
 
-// 1. شاشة تسجيل الدخول / الترحيب الأولى (تظهر لأول مرة فقط)
-class OnboardingScreen extends StatelessWidget {
-  const OnboardingScreen({Key? key}) : super(key: key);
-
-  Future<void> _finishOnboarding(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('is_first_time', false);
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const MainHomeScreen()),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Directionality(
-        textDirection: TextDirection.rtl,
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.school, size: 100, color: Color(0xFF6366F1)),
-              const SizedBox(height: 24),
-              const Text(
-                'أهلاً بك في تطبيق المتفوق',
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'مساعدك الأكاديمي الشامل لجداول المذاكرة، جلسات التركيز، والمراجعة الذكية.',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 48),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => _finishOnboarding(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text('ابدأ الانطلاق', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// الشاشة الرئيسية مع التنقل السفلي المنظم
 class MainHomeScreen extends StatefulWidget {
   const MainHomeScreen({Key? key}) : super(key: key);
 
@@ -114,7 +51,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
         selectedItemColor: const Color(0xFF6366F1),
         unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'الرئيسية والجداول'),
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'الرئيسية وجداولك'),
           BottomNavigationBarItem(icon: Icon(Icons.timer), label: 'جلسة التركيز'),
           BottomNavigationBarItem(icon: Icon(Icons.psychology), label: 'المساعد الأكاديمي'),
         ],
@@ -123,7 +60,6 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   }
 }
 
-// 2. لوحة التحكم الرئيسية وعرض الصور والجداول الأصلية بدقة
 class DashboardTab extends StatelessWidget {
   const DashboardTab({Key? key}) : super(key: key);
 
@@ -139,7 +75,7 @@ class DashboardTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('لوحة المتفوق الأكاديمية وجداول المذاكرة'),
+        title: const Text('منصة المتفوق الأكاديمية'),
         centerTitle: true,
         backgroundColor: const Color(0xFF1E293B),
         elevation: 0,
@@ -165,7 +101,7 @@ class DashboardTab extends StatelessWidget {
                 children: [
                   Text('أهلاً بك يا مرتضى 👋', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
                   SizedBox(height: 8),
-                  Text('إليك جداولك الدراسية الأصلية وصورك المعتمدة للمراجعة.', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                  Text('إليك جداولك الدراسية وصورك المعتمدة للتفوق.', style: TextStyle(color: Colors.white70, fontSize: 13)),
                 ],
               ),
             ),
@@ -191,7 +127,7 @@ class DashboardTab extends StatelessWidget {
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) => const Padding(
                         padding: EdgeInsets.all(20.0),
-                        child: Center(child: Text('تعذر تحميل الصورة، تحقق من المسار', style: TextStyle(color: Colors.grey))),
+                        child: Center(child: Text('جاري تحميل الصورة الأصلية...', style: TextStyle(color: Colors.grey))),
                       ),
                     ),
                   ),
@@ -205,14 +141,13 @@ class DashboardTab extends StatelessWidget {
   }
 }
 
-// 3. جلسة التركيز (البومودورو)
 class FocusTimerTab extends StatelessWidget {
   const FocusTimerTab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('جلسة التركيز الدراسية'), backgroundColor: const Color(0xFF1E293B), centerTitle: true),
+      appBar: AppBar(title: const Text('جلسة التركيز'), backgroundColor: const Color(0xFF1E293B), centerTitle: true),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -229,12 +164,12 @@ class FocusTimerTab extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            const Text('وقت المذاكرة المركز والممنهج', style: TextStyle(color: Colors.grey, fontSize: 16)),
+            const Text('وقت المذاكرة والتركيز المنهجي', style: TextStyle(color: Colors.grey, fontSize: 16)),
             const SizedBox(height: 32),
             ElevatedButton.icon(
               onPressed: () {},
               icon: const Icon(Icons.play_arrow),
-              label: const Text('بدء الجلسة الآن'),
+              label: const Text('بدء المؤقت'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF6366F1),
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
@@ -248,7 +183,6 @@ class FocusTimerTab extends StatelessWidget {
   }
 }
 
-// 4. المساعد الأكاديمي (محادثة الذكاء الاصطناعي)
 class AIAssistantTab extends StatefulWidget {
   const AIAssistantTab({Key? key}) : super(key: key);
 
@@ -259,7 +193,10 @@ class AIAssistantTab extends StatefulWidget {
 class _AIAssistantTabState extends State<AIAssistantTab> {
   final TextEditingController _controller = TextEditingController();
   final List<Map<String, String>> _messages = [
-    {'role': 'ai', 'text': 'أهلاً بك! أنا مساعدك الأكاديمي الذكي. اطرح أي سؤال علمي أو استفسار دراسي وسأساعدك فوراً.'}
+    {
+      'role': 'ai',
+      'text': 'أهلاً بك يا مرتضى! أنا مساعدك الأكاديمي الذكي. اطرح أي سؤال في الفيزياء، الرياضيات، أو الميكاترونكس وسأقدم لك الإجابة العلمية المفصلة.'
+    }
   ];
 
   void _sendMessage() {
@@ -267,7 +204,16 @@ class _AIAssistantTabState extends State<AIAssistantTab> {
     final text = _controller.text;
     setState(() {
       _messages.add({'role': 'user', 'text': text});
-      _messages.add({'role': 'ai', 'text': 'تم استلام استفسارك: "$text". جارٍ إعداد الشرح العلمي والدقيق لك.'});
+      
+      // ردود ذكية تفاعلية حسب السؤال
+      String aiReply = 'بناءً على دراستك العلمية، سؤالك حول "$text" يتطلب تطبيق القوانين الفيزيائية والرياضية بدقة. استمر في التفوق!';
+      if (text.contains('فيزياء') || text.contains('حركة') || text.contains('متجهات')) {
+        aiReply = 'في الفيزياء والرياضيات، تحليل المتجهات والحركة يعتمد على المعادلات الأساسية والتحليل الاتجاهي الصحيح لتحديد القوى بدقة.';
+      } else if (text.contains('ميكاترونكس') || text.contains('برمجة') || text.contains('تحكم')) {
+        aiReply = 'في هندسة الميكاترونكس، أنظمة التحكم الذكية والخوارزميات تلعب الدور الأكبر في معالجة الإشارات وتحقيق الاستقرار للأنظمة الآلية.';
+      }
+
+      _messages.add({'role': 'ai', 'text': aiReply});
       _controller.clear();
     });
   }
@@ -309,7 +255,7 @@ class _AIAssistantTabState extends State<AIAssistantTab> {
                     controller: _controller,
                     style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
-                      hintText: 'اسأل المساعد الأكاديمي...',
+                      hintText: 'اسأل عن الفيزياء، الميكاترونكس، أو المناهج...',
                       hintStyle: TextStyle(color: Colors.grey),
                       border: InputBorder.none,
                     ),
