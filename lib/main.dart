@@ -16,64 +16,31 @@ class AlMutafawiqApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFF0F172A),
         primaryColor: const Color(0xFF6366F1),
       ),
-      home: const OnboardingSequenceScreen(),
+      home: const StrictLoginOrWelcomeScreen(),
     );
   }
 }
 
-// 1. تسلسل الشاشات والأسماء الأصلية الصحيحة للصور
-class OnboardingSequenceScreen extends StatefulWidget {
-  const OnboardingSequenceScreen({Key? key}) : super(key: key);
-
-  @override
-  State<OnboardingSequenceScreen> createState() => _OnboardingSequenceScreenState();
-}
-
-class _OnboardingSequenceScreenState extends State<OnboardingSequenceScreen> {
-  int currentStep = 0;
-
-  // الأسماء الفعلية والصحيحة للصور كما تم رفعها تماماً
-  final List<String> originalImages = [
-    'assets/images/file_0000000037c881f49b41687f48f122b9.png',
-    'assets/images/file_00000000dcb081f48b5f5eb66e29f4e8.png',
-    'assets/images/file_00000000ebf081f48549bc8ef97aeb19.png',
-    'assets/images/file_00000000f04881f49888a9435e3b4682.png',
-    'assets/images/file_00000000fb2881f483ab267660e3271e.png',
-  ];
-
-  void _nextStep() {
-    if (currentStep < originalImages.length - 1) {
-      setState(() => currentStep++);
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MainHomeScreen()),
-      );
-    }
-  }
-
-  void _prevStep() {
-    if (currentStep > 0) {
-      setState(() => currentStep--);
-    }
-  }
+// 1. شاشة تسجيل الدخول / الترحيب الأولى (إجبارية ولا يمكن تخطيها إلا بالضغط هنا)
+class StrictLoginOrWelcomeScreen extends StatelessWidget {
+  const StrictLoginOrWelcomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
               const SizedBox(height: 10),
-              Text(
-                'الجدول أو الصورة الأصلية (${currentStep + 1} من ${originalImages.length})',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              const Text(
+                'تسجيل الدخول / شاشة الترحيب',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               
-              // عرض الصورة الحالية بوضوح تام مع خاصية التكبير
+              // الصورة الأولى الإجبارية للترحيب/التسجيل
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -87,10 +54,10 @@ class _OnboardingSequenceScreenState extends State<OnboardingSequenceScreen> {
                     child: InteractiveViewer(
                       maxScale: 4.0,
                       child: Image.asset(
-                        originalImages[currentStep],
+                        'assets/images/file_0000000037c881f49b41687f48f122b9.png',
                         fit: BoxFit.contain,
                         errorBuilder: (c, e, s) => const Center(
-                          child: Text('جاري تحميل الصورة الأصلية...', style: TextStyle(color: Colors.grey)),
+                          child: Text('جاري تحميل شاشة الترحيب...', style: TextStyle(color: Colors.grey)),
                         ),
                       ),
                     ),
@@ -99,36 +66,25 @@ class _OnboardingSequenceScreenState extends State<OnboardingSequenceScreen> {
               ),
               const SizedBox(height: 20),
 
-              // الأزرار المفعلة للانتقال بين الصور
-              Row(
-                children: [
-                  if (currentStep > 0)
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: _prevStep,
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                        child: const Text('السابق', style: TextStyle(color: Colors.white, fontSize: 16)),
-                      ),
-                    ),
-                  if (currentStep > 0) const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _nextStep,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6366F1),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: Text(
-                        currentStep == originalImages.length - 1 ? 'الانتقال للرئيسية والتركيز' : 'التالي',
-                        style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                    ),
+              // زر الدخول الإجباري للانتقال لباقي الجداول
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    // الانتقال المحسوم بعد إتمام تسجيل الدخول / الترحيب
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const SequentialImagesScreen()),
+                    );
+                  },
+                  icon: const Icon(Icons.login),
+                  label: const Text('إتمام الدخول والانتقال للجداول', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6366F1),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                ],
+                ),
               ),
             ],
           ),
@@ -138,7 +94,122 @@ class _OnboardingSequenceScreenState extends State<OnboardingSequenceScreen> {
   }
 }
 
-// 2. الشاشة الرئيسية: جلسة التركيز (مع إمكانية تخصيص الوقت وحظر التطبيقات) والمساعد الأكاديمي
+// 2. شاشة عرض الصور والجداول الأصلية المتبقية واحدة تلو الأخرى بالأزرار
+class SequentialImagesScreen extends StatefulWidget {
+  const SequentialImagesScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SequentialImagesScreen> createState() => _SequentialImagesScreenState();
+}
+
+class _SequentialImagesScreenState extends State<SequentialImagesScreen> {
+  int currentImageIndex = 1; // تبدأ من الصورة الثانية لأن الأولى كانت للترحيب
+
+  // باقي الصور الأصلية
+  final List<String> remainingImages = [
+    'assets/images/file_00000000dcb081f48b5f5eb66e29f4e8.png',
+    'assets/images/file_00000000ebf081f48549bc8ef97aeb19.png',
+    'assets/images/file_00000000f04881f49888a9435e3b4682.png',
+    'assets/images/file_00000000fb2881f483ab267660e3271e.png',
+  ];
+
+  void _nextImage() {
+    if (currentImageIndex < remainingImages.length - 1) {
+      setState(() => currentImageIndex++);
+    } else {
+      // الانتقال النهائي للشاشة الرئيسية (جلسة التركيز والمساعد)
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainHomeScreen()),
+      );
+    }
+  }
+
+  void _prevImage() {
+    if (currentImageIndex > 0) {
+      setState(() => currentImageIndex--);
+    } else {
+      // العودة لشاشة الترحيب إذا أراد المستخدم
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const StrictLoginOrWelcomeScreen()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('الجدول الأصلي (${currentImageIndex + 1} من ${remainingImages.length + 1})'),
+        backgroundColor: const Color(0xFF1E293B),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E293B),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white12),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: InteractiveViewer(
+                    maxScale: 4.0,
+                    child: Image.asset(
+                      remainingImages[currentImageIndex],
+                      fit: BoxFit.contain,
+                      errorBuilder: (c, e, s) => const Center(
+                        child: Text('جاري تحميل الجدول...', style: TextStyle(color: Colors.grey)),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _prevImage,
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: const Text('السابق', style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _nextImage,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6366F1),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: Text(
+                      currentImageIndex == remainingImages.length - 1 ? 'الانتقال للرئيسية' : 'التالي',
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// 3. الشاشة الرئيسية: جلسة التركيز (تخصيص الوقت وحظر التطبيقات) والمساعد الأكاديمي
 class MainHomeScreen extends StatefulWidget {
   const MainHomeScreen({Key? key}) : super(key: key);
 
@@ -176,7 +247,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   }
 }
 
-// 3. جلسة التركيز مع إمكانية تعيين الوقت وحظر التطبيقات
+// 4. جلسة التركيز المخصصة
 class FocusTimerTab extends StatefulWidget {
   const FocusTimerTab({Key? key}) : super(key: key);
 
@@ -187,7 +258,7 @@ class FocusTimerTab extends StatefulWidget {
 class _FocusTimerTabState extends State<FocusTimerTab> {
   bool isAppBlockerActive = true;
   bool isTimerRunning = false;
-  int selectedMinutes = 25; // الوقت الافتراضي وقابل للتعديل
+  int selectedMinutes = 25;
 
   void _showTimePickerModal() {
     showDialog(
@@ -199,19 +270,19 @@ class _FocusTimerTabState extends State<FocusTimerTab> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              title: const Text('15 دقيقة (مراجعة سريعة)', style: TextStyle(color: Colors.white70)),
+              title: const Text('15 دقيقة', style: TextStyle(color: Colors.white70)),
               onTap: () { setState(() => selectedMinutes = 15); Navigator.pop(context); },
             ),
             ListTile(
-              title: const Text('25 دقيقة (جلسة بومودورو قياسية)', style: TextStyle(color: Colors.white)),
+              title: const Text('25 دقيقة (قياسي)', style: TextStyle(color: Colors.white)),
               onTap: () { setState(() => selectedMinutes = 25); Navigator.pop(context); },
             ),
             ListTile(
-              title: const Text('45 دقيقة (جلسة متقدمة)', style: TextStyle(color: Colors.white70)),
+              title: const Text('45 دقيقة', style: TextStyle(color: Colors.white70)),
               onTap: () { setState(() => selectedMinutes = 45); Navigator.pop(context); },
             ),
             ListTile(
-              title: const Text('60 دقيقة (ساعة كاملة للمذاكرة)', style: TextStyle(color: Colors.white70)),
+              title: const Text('60 دقيقة', style: TextStyle(color: Colors.white70)),
               onTap: () { setState(() => selectedMinutes = 60); Navigator.pop(context); },
             ),
           ],
@@ -233,11 +304,10 @@ class _FocusTimerTabState extends State<FocusTimerTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // زر تخصيص الوقت
             OutlinedButton.icon(
               onPressed: isTimerRunning ? null : _showTimePickerModal,
               icon: const Icon(Icons.edit, color: Color(0xFF6366F1)),
-              label: Text('وقت الجلسة الحالي: $selectedMinutes دقيقة (اضغط للتغيير)', style: const TextStyle(color: Colors.white)),
+              label: Text('وقت الجلسة: $selectedMinutes دقيقة (اضغط للتغيير)', style: const TextStyle(color: Colors.white)),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Color(0xFF6366F1)),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -245,8 +315,6 @@ class _FocusTimerTabState extends State<FocusTimerTab> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // مفتاح حظر التطبيقات
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
@@ -261,7 +329,7 @@ class _FocusTimerTabState extends State<FocusTimerTab> {
                     children: [
                       Icon(Icons.block, color: Colors.redAccent),
                       SizedBox(width: 8),
-                      Text('حظر التطبيقات المشتتة أثناء الجلسة', style: TextStyle(color: Colors.white, fontSize: 13)),
+                      Text('حظر التطبيقات المشتتة', style: TextStyle(color: Colors.white, fontSize: 13)),
                     ],
                   ),
                   Switch(
@@ -273,8 +341,6 @@ class _FocusTimerTabState extends State<FocusTimerTab> {
               ),
             ),
             const SizedBox(height: 30),
-
-            // دائرة المؤقت
             Container(
               width: 200,
               height: 200,
@@ -302,8 +368,6 @@ class _FocusTimerTabState extends State<FocusTimerTab> {
               ),
             ),
             const SizedBox(height: 30),
-
-            // زر التشغيل
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -322,7 +386,7 @@ class _FocusTimerTabState extends State<FocusTimerTab> {
                 },
                 icon: Icon(isTimerRunning ? Icons.pause : Icons.play_arrow),
                 label: Text(
-                  isTimerRunning ? 'إيقاف الجلسة المؤقتة' : 'بدء الجلسة وحظر التطبيقات',
+                  isTimerRunning ? 'إيقاف الجلسة' : 'بدء الجلسة وحظر التطبيقات',
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -339,7 +403,7 @@ class _FocusTimerTabState extends State<FocusTimerTab> {
   }
 }
 
-// 4. المساعد الأكاديمي
+// 5. المساعد الأكاديمي
 class AIAssistantTab extends StatefulWidget {
   const AIAssistantTab({Key? key}) : super(key: key);
 
@@ -352,7 +416,7 @@ class _AIAssistantTabState extends State<AIAssistantTab> {
   final List<Map<String, String>> _messages = [
     {
       'role': 'ai',
-      'text': 'أهلاً بك يا مرتضى! أنا مساعدك الأكاديمي الذكي. اطرح أي سؤال في الفيزياء، الرياضيات، أو الميكاترونكس وسأجيبك فوراً.'
+      'text': 'أهلاً بك يا مرتضى! أنا مساعدك الأكاديمي الذكي. اطرح أي سؤال علمي وسأجيبك فوراً.'
     }
   ];
 
@@ -362,11 +426,11 @@ class _AIAssistantTabState extends State<AIAssistantTab> {
     setState(() {
       _messages.add({'role': 'user', 'text': text});
       
-      String aiReply = 'بناءً على دراستك العلمية، سؤالك حول "$text" يتطلب تطبيق القوانين الفيزيائية والرياضية بدقة. واصل اجتهادك!';
+      String aiReply = 'بناءً على دراستك العلمية، سؤالك حول "$text" يتطلب تطبيق القوانين والتحليل السليم.';
       if (text.contains('فيزياء') || text.contains('حركة') || text.contains('متجهات')) {
-        aiReply = 'في الفيزياء والرياضيات، تحليل المتجهات والحركة يعتمد على القوانين الأساسية والتحليل الاتجاهي السليم.';
+        aiReply = 'في الفيزياء والرياضيات، تحليل المتجهات والحركة يعتمد على القوانين الأساسية والتحليل الاتجاهي.';
       } else if (text.contains('ميكاترونكس') || text.contains('برمجة') || text.contains('تحكم')) {
-        aiReply = 'في هندسة الميكاترونكس، أنظمة التحكم الذكية والخوارزميات تلعب الدور الأكبر في استقرار الأجهزة الآلية.';
+        aiReply = 'في هندسة الميكاترونكس، أنظمة التحكم الذكية والخوارزميات تلعب الدور الأكبر في استقرار الأجهزة.';
       }
 
       _messages.add({'role': 'ai', 'text': aiReply});
