@@ -10,80 +10,185 @@ class AlMutafawiqApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'تطبيق المتفوق',
+      title: 'المتفوق',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF0F172A),
-        primaryColor: const Color(0xFF6366F1),
+      theme: ThemeData(
+        fontFamily: 'Cairo',
+        primaryColor: const Color(0xFF6C3FD9),
+        scaffoldBackgroundColor: const Color(0xFFF8F9FA),
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: const Color(0xFF6C3FD9),
+          secondary: const Color(0xFF172B4D),
+        ),
       ),
-      home: const StrictLoginOrWelcomeScreen(),
+      home: const WelcomeScreen(),
     );
   }
 }
 
-// 1. شاشة تسجيل الدخول / الترحيب الأولى (إجبارية ولا يمكن تخطيها إلا بالضغط هنا)
-class StrictLoginOrWelcomeScreen extends StatelessWidget {
-  const StrictLoginOrWelcomeScreen({Key? key}) : super(key: key);
+// ==========================================
+// 1. شاشة البداية والترحيب
+// ==========================================
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-              const Text(
-                'تسجيل الدخول / شاشة الترحيب',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-              const SizedBox(height: 20),
-              
-              // الصورة الأولى الإجبارية للترحيب/التسجيل
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white12),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: InteractiveViewer(
-                      maxScale: 4.0,
-                      child: Image.asset(
-                        'assets/images/file_0000000037c881f49b41687f48f122b9.png',
-                        fit: BoxFit.contain,
-                        errorBuilder: (c, e, s) => const Center(
-                          child: Text('جاري تحميل شاشة الترحيب...', style: TextStyle(color: Colors.grey)),
+      body: Directionality(
+        textDirection: TextDirection.rtl,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.school, size: 40, color: Color(0xFF6C3FD9)),
+                    SizedBox(width: 8),
+                    Text(
+                      'المتفوق',
+                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF172B4D)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'طريقك نحو التفوق يبدأ من هنا',
+                  style: TextStyle(fontSize: 16, color: Colors.grey, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 30),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF0EBFB),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset(
+                          'assets/images/file_0000000037c881f49b41687f48f122b9.png',
+                          fit: BoxFit.contain,
+                          errorBuilder: (c, e, s) => const Icon(Icons.school_outlined, size: 120, color: Color(0xFF6C3FD9)),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 30),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterScreen()));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6C3FD9),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 2,
+                    ),
+                    child: const Text('ابدأ رحلتك الآن', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFF6C3FD9), width: 1.5),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                    child: const Text('تسجيل الدخول', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF6C3FD9))),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
-              // زر الدخول الإجباري للانتقال لباقي الجداول
+// ==========================================
+// 2. شاشات إنشاء الحساب وتسجيل الدخول
+// ==========================================
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({Key? key}) : super(key: key);
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, iconTheme: const IconThemeData(color: Color(0xFF172B4D))),
+      body: Directionality(
+        textDirection: TextDirection.rtl,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('إنشاء حساب جديد', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF172B4D))),
+              const SizedBox(height: 8),
+              const Text('ابدأ رحلتك نحو التفوق وتنظيم وقتك', style: TextStyle(color: Colors.grey)),
+              const SizedBox(height: 30),
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'الاسم الكامل',
+                  prefixIcon: const Icon(Icons.person_outline),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  labelText: 'البريد الإلكتروني',
+                  prefixIcon: const Icon(Icons.email_outlined),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'كلمة المرور',
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+              const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton.icon(
+                child: ElevatedButton(
                   onPressed: () {
-                    // الانتقال المحسوم بعد إتمام تسجيل الدخول / الترحيب
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const SequentialImagesScreen()),
-                    );
+                    // الانتقال لمعالج الإعداد
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const SetupGoalScreen()));
                   },
-                  icon: const Icon(Icons.login),
-                  label: const Text('إتمام الدخول والانتقال للجداول', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
+                    backgroundColor: const Color(0xFF6C3FD9),
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
+                  child: const Text('إنشاء الحساب ومتابعة الإعداد', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
             ],
@@ -94,122 +199,209 @@ class StrictLoginOrWelcomeScreen extends StatelessWidget {
   }
 }
 
-// 2. شاشة عرض الصور والجداول الأصلية المتبقية واحدة تلو الأخرى بالأزرار
-class SequentialImagesScreen extends StatefulWidget {
-  const SequentialImagesScreen({Key? key}) : super(key: key);
-
-  @override
-  State<SequentialImagesScreen> createState() => _SequentialImagesScreenState();
-}
-
-class _SequentialImagesScreenState extends State<SequentialImagesScreen> {
-  int currentImageIndex = 1; // تبدأ من الصورة الثانية لأن الأولى كانت للترحيب
-
-  // باقي الصور الأصلية
-  final List<String> remainingImages = [
-    'assets/images/file_00000000dcb081f48b5f5eb66e29f4e8.png',
-    'assets/images/file_00000000ebf081f48549bc8ef97aeb19.png',
-    'assets/images/file_00000000f04881f49888a9435e3b4682.png',
-    'assets/images/file_00000000fb2881f483ab267660e3271e.png',
-  ];
-
-  void _nextImage() {
-    if (currentImageIndex < remainingImages.length - 1) {
-      setState(() => currentImageIndex++);
-    } else {
-      // الانتقال النهائي للشاشة الرئيسية (جلسة التركيز والمساعد)
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MainHomeScreen()),
-      );
-    }
-  }
-
-  void _prevImage() {
-    if (currentImageIndex > 0) {
-      setState(() => currentImageIndex--);
-    } else {
-      // العودة لشاشة الترحيب إذا أراد المستخدم
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const StrictLoginOrWelcomeScreen()),
-      );
-    }
-  }
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('الجدول الأصلي (${currentImageIndex + 1} من ${remainingImages.length + 1})'),
-        backgroundColor: const Color(0xFF1E293B),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.white12),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: InteractiveViewer(
-                    maxScale: 4.0,
-                    child: Image.asset(
-                      remainingImages[currentImageIndex],
-                      fit: BoxFit.contain,
-                      errorBuilder: (c, e, s) => const Center(
-                        child: Text('جاري تحميل الجدول...', style: TextStyle(color: Colors.grey)),
-                      ),
-                    ),
-                  ),
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, iconTheme: const IconThemeData(color: Color(0xFF172B4D))),
+      body: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('تسجيل الدخول', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF172B4D))),
+              const SizedBox(height: 8),
+              const Text('مرحباً بعودتك! استكمل رحلة تفوقك', style: TextStyle(color: Colors.grey)),
+              const SizedBox(height: 30),
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'البريد الإلكتروني',
+                  prefixIcon: const Icon(Icons.email_outlined),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: _prevImage,
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: const Text('السابق', style: TextStyle(color: Colors.white)),
-                  ),
+              const SizedBox(height: 16),
+              TextField(
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'كلمة المرور',
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _nextImage,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6366F1),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: Text(
-                      currentImageIndex == remainingImages.length - 1 ? 'الانتقال للرئيسية' : 'التالي',
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
+              ),
+              const SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainHomeScreen()));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6C3FD9),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
+                  child: const Text('دخول', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-// 3. الشاشة الرئيسية: جلسة التركيز (تخصيص الوقت وحظر التطبيقات) والمساعد الأكاديمي
+// ==========================================
+// 3. رحلة الإعداد الأولي (تحديد مدة المذاكرة)
+// ==========================================
+class SetupGoalScreen extends StatefulWidget {
+  const SetupGoalScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SetupGoalScreen> createState() => _SetupGoalScreenState();
+}
+
+class _SetupGoalScreenState extends State<SetupGoalScreen> {
+  int selectedMinutes = 120;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Directionality(
+        textDirection: TextDirection.rtl,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const LinearProgressIndicator(value: 0.33, backgroundColor: Color(0xFFE2E8F0), color: Color(0xFF6C3FD9)),
+                const SizedBox(height: 24),
+                const Text('ما مدة المذاكرة اليومية التي تناسبك؟', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF172B4D))),
+                const SizedBox(height: 8),
+                const Text('اختر المدة التي تريد أن تذاكرها كل يوم لتحقيق هدفك.', style: TextStyle(color: Colors.grey)),
+                const SizedBox(height: 24),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [30, 60, 90, 120, 180, 240].map((mins) {
+                    final isSelected = selectedMinutes == mins;
+                    return ChoiceChip(
+                      label: Text(mins >= 60 ? '${mins ~/ 60} ساعة' : '$mins دقيقة'),
+                      selected: isSelected,
+                      selectedColor: const Color(0xFF6C3FD9),
+                      labelStyle: TextStyle(color: isSelected ? Colors.white : const Color(0xFF172B4D), fontWeight: FontWeight.bold),
+                      onSelected: (val) {
+                        setState(() => selectedMinutes = mins);
+                      },
+                    );
+                  }).toList(),
+                ),
+                const Spacer(),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SetupAppBlockerScreen()));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6C3FD9),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: const Text('التالي', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ==========================================
+// 4. اختيار التطبيقات المحظورة
+// ==========================================
+class SetupAppBlockerScreen extends StatefulWidget {
+  const SetupAppBlockerScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SetupAppBlockerScreen> createState() => _SetupAppBlockerScreenState();
+}
+
+class _SetupAppBlockerScreenState extends State<SetupAppBlockerScreen> {
+  final Map<String, bool> _apps = {
+    'YouTube': true,
+    'Instagram': true,
+    'TikTok': true,
+    'Facebook': false,
+    'WhatsApp': false,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Directionality(
+        textDirection: TextDirection.rtl,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const LinearProgressIndicator(value: 0.66, backgroundColor: Color(0xFFE2E8F0), color: Color(0xFF6C3FD9)),
+                const SizedBox(height: 24),
+                const Text('اختر التطبيقات المشتتة للانتباه', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF172B4D))),
+                const SizedBox(height: 8),
+                const Text('سيتم تقييد الوصول لهذه التطبيقات أثناء جلسة التركيز.', style: TextStyle(color: Colors.grey)),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: ListView(
+                    children: _apps.keys.map((appName) {
+                      return CheckboxListTile(
+                        title: Text(appName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        value: _apps[appName],
+                        activeColor: const Color(0xFF6C3FD9),
+                        onChanged: (val) {
+                          setState(() => _apps[appName] = val ?? false);
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainHomeScreen()));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6C3FD9),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: const Text('تفعيل وضع التركيز والانطلاق', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ==========================================
+// 5. الواجهة الرئيسية والجلسات والمساعد الذكي
+// ==========================================
 class MainHomeScreen extends StatefulWidget {
   const MainHomeScreen({Key? key}) : super(key: key);
 
@@ -223,6 +415,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   final List<Widget> _screens = [
     const FocusTimerTab(),
     const AIAssistantTab(),
+    const AnalyticsTab(),
   ];
 
   @override
@@ -235,19 +428,18 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
-        backgroundColor: const Color(0xFF1E293B),
-        selectedItemColor: const Color(0xFF6366F1),
+        selectedItemColor: const Color(0xFF6C3FD9),
         unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.timer), label: 'جلسة التركيز والوقت'),
-          BottomNavigationBarItem(icon: Icon(Icons.psychology), label: 'المساعد الأكاديمي'),
+          BottomNavigationBarItem(icon: Icon(Icons.timer), label: 'جلسة التركيز'),
+          BottomNavigationBarItem(icon: Icon(Icons.psychology), label: 'المساعد الذكي'),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'الإحصائيات'),
         ],
       ),
     );
   }
 }
 
-// 4. جلسة التركيز المخصصة
 class FocusTimerTab extends StatefulWidget {
   const FocusTimerTab({Key? key}) : super(key: key);
 
@@ -256,143 +448,74 @@ class FocusTimerTab extends StatefulWidget {
 }
 
 class _FocusTimerTabState extends State<FocusTimerTab> {
-  bool isAppBlockerActive = true;
   bool isTimerRunning = false;
-  int selectedMinutes = 25;
-
-  void _showTimePickerModal() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
-        title: const Text('حدد وقت المذاكرة (بالدقائق)', style: TextStyle(color: Colors.white)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: const Text('15 دقيقة', style: TextStyle(color: Colors.white70)),
-              onTap: () { setState(() => selectedMinutes = 15); Navigator.pop(context); },
-            ),
-            ListTile(
-              title: const Text('25 دقيقة (قياسي)', style: TextStyle(color: Colors.white)),
-              onTap: () { setState(() => selectedMinutes = 25); Navigator.pop(context); },
-            ),
-            ListTile(
-              title: const Text('45 دقيقة', style: TextStyle(color: Colors.white70)),
-              onTap: () { setState(() => selectedMinutes = 45); Navigator.pop(context); },
-            ),
-            ListTile(
-              title: const Text('60 دقيقة', style: TextStyle(color: Colors.white70)),
-              onTap: () { setState(() => selectedMinutes = 60); Navigator.pop(context); },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  bool isAppBlockerActive = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('جلسة التركيز ووقت المذاكرة'),
-        backgroundColor: const Color(0xFF1E293B),
+        title: const Text('جلسة التركيز بومودورو'),
+        backgroundColor: const Color(0xFF6C3FD9),
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            OutlinedButton.icon(
-              onPressed: isTimerRunning ? null : _showTimePickerModal,
-              icon: const Icon(Icons.edit, color: Color(0xFF6366F1)),
-              label: Text('وقت الجلسة: $selectedMinutes دقيقة (اضغط للتغيير)', style: const TextStyle(color: Colors.white)),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFF6366F1)),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('تفعيل حظر التطبيقات المشتتة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF172B4D))),
+                Switch(
+                  value: isAppBlockerActive,
+                  activeColor: const Color(0xFF6C3FD9),
+                  onChanged: (val) => setState(() => isAppBlockerActive = val),
+                ),
+              ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 40),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E293B),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white12),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Row(
-                    children: [
-                      Icon(Icons.block, color: Colors.redAccent),
-                      SizedBox(width: 8),
-                      Text('حظر التطبيقات المشتتة', style: TextStyle(color: Colors.white, fontSize: 13)),
-                    ],
-                  ),
-                  Switch(
-                    value: isAppBlockerActive,
-                    activeColor: const Color(0xFF6366F1),
-                    onChanged: (val) => setState(() => isAppBlockerActive = val),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 30),
-            Container(
-              width: 200,
-              height: 200,
+              width: 220,
+              height: 220,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF1E293B),
-                border: Border.all(
-                  color: isTimerRunning ? Colors.greenAccent : const Color(0xFF6366F1),
-                  width: 8,
+                color: const Color(0xFFF0EBFB),
+                border: Border.all(color: isTimerRunning ? Colors.green : const Color(0xFF6C3FD9), width: 8),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      isTimerRunning ? '24:59' : '25:00',
+                      style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Color(0xFF172B4D)),
+                    ),
+                    Text(
+                      isTimerRunning ? 'التركيز نشط' : 'جاهز للمذاكرة',
+                      style: TextStyle(color: isTimerRunning ? Colors.green : Colors.grey, fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '$selectedMinutes:00',
-                    style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    isTimerRunning ? 'قيد التركيز والحظر' : 'جاهز للبدء',
-                    style: TextStyle(color: isTimerRunning ? Colors.greenAccent : Colors.grey, fontSize: 14),
-                  ),
-                ],
-              ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 50),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () {
                   setState(() => isTimerRunning = !isTimerRunning);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        isTimerRunning
-                            ? 'بدء جلسة التركيز لمدة $selectedMinutes دقيقة ${isAppBlockerActive ? 'مع حظر التطبيقات!' : ''}'
-                            : 'تم إيقاف الجلسة',
-                      ),
-                      backgroundColor: isTimerRunning ? Colors.green : Colors.orange,
-                    ),
-                  );
                 },
                 icon: Icon(isTimerRunning ? Icons.pause : Icons.play_arrow),
                 label: Text(
-                  isTimerRunning ? 'إيقاف الجلسة' : 'بدء الجلسة وحظر التطبيقات',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  isTimerRunning ? 'إيقاف الجلسة' : 'بدء جلسة التركيز',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isTimerRunning ? Colors.redAccent : const Color(0xFF6366F1),
+                  backgroundColor: isTimerRunning ? Colors.redAccent : const Color(0xFF6C3FD9),
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
               ),
             ),
@@ -403,7 +526,6 @@ class _FocusTimerTabState extends State<FocusTimerTab> {
   }
 }
 
-// 5. المساعد الأكاديمي
 class AIAssistantTab extends StatefulWidget {
   const AIAssistantTab({Key? key}) : super(key: key);
 
@@ -414,10 +536,7 @@ class AIAssistantTab extends StatefulWidget {
 class _AIAssistantTabState extends State<AIAssistantTab> {
   final TextEditingController _controller = TextEditingController();
   final List<Map<String, String>> _messages = [
-    {
-      'role': 'ai',
-      'text': 'أهلاً بك يا مرتضى! أنا مساعدك الأكاديمي الذكي. اطرح أي سؤال علمي وسأجيبك فوراً.'
-    }
+    {'role': 'ai', 'text': 'مرحباً بك! أنا مساعدك الأكاديمي الذكي في منصة المتفوق. اطرح أي سؤال علمي أو دراسي.'}
   ];
 
   void _sendMessage() {
@@ -425,15 +544,7 @@ class _AIAssistantTabState extends State<AIAssistantTab> {
     final text = _controller.text;
     setState(() {
       _messages.add({'role': 'user', 'text': text});
-      
-      String aiReply = 'بناءً على دراستك العلمية، سؤالك حول "$text" يتطلب تطبيق القوانين والتحليل السليم.';
-      if (text.contains('فيزياء') || text.contains('حركة') || text.contains('متجهات')) {
-        aiReply = 'في الفيزياء والرياضيات، تحليل المتجهات والحركة يعتمد على القوانين الأساسية والتحليل الاتجاهي.';
-      } else if (text.contains('ميكاترونكس') || text.contains('برمجة') || text.contains('تحكم')) {
-        aiReply = 'في هندسة الميكاترونكس، أنظمة التحكم الذكية والخوارزميات تلعب الدور الأكبر في استقرار الأجهزة.';
-      }
-
-      _messages.add({'role': 'ai', 'text': aiReply});
+      _messages.add({'role': 'ai', 'text': 'سؤالك حول "$text" مهم جداً. في الفيزياء والرياضيات والميكاترونكس، نعتمد على التحليل المنطقي والقوانين العلمية الأساسية.'});
       _controller.clear();
     });
   }
@@ -441,7 +552,7 @@ class _AIAssistantTabState extends State<AIAssistantTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('المساعد الأكاديمي والذكاء الاصطناعي'), backgroundColor: const Color(0xFF1E293B), centerTitle: true),
+      appBar: AppBar(title: const Text('المساعد الأكاديمي الذكي'), backgroundColor: const Color(0xFF6C3FD9), centerTitle: true),
       body: Column(
         children: [
           Expanded(
@@ -456,10 +567,10 @@ class _AIAssistantTabState extends State<AIAssistantTab> {
                     margin: const EdgeInsets.symmetric(vertical: 6),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: isUser ? const Color(0xFF6366F1) : const Color(0xFF1E293B),
+                      color: isUser ? const Color(0xFF6C3FD9) : const Color(0xFFE2E8F0),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Text(_messages[index]['text']!, style: const TextStyle(color: Colors.white, fontSize: 14)),
+                    child: Text(_messages[index]['text']!, style: TextStyle(color: isUser ? Colors.white : const Color(0xFF172B4D))),
                   ),
                 );
               },
@@ -467,28 +578,52 @@ class _AIAssistantTabState extends State<AIAssistantTab> {
           ),
           Container(
             padding: const EdgeInsets.all(12),
-            color: const Color(0xFF1E293B),
+            color: Colors.white,
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
-                      hintText: 'اسأل المساعد الأكاديمي...',
-                      hintStyle: TextStyle(color: Colors.grey),
-                      border: InputBorder.none,
-                    ),
+                    decoration: const InputDecoration(hintText: 'اسأل عن المناهج والفيزياء...', border: InputBorder.none),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.send, color: Color(0xFF6366F1)),
-                  onPressed: _sendMessage,
-                ),
+                IconButton(icon: const Icon(Icons.send, color: Color(0xFF6C3FD9)), onPressed: _sendMessage),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class AnalyticsTab extends StatelessWidget {
+  const AnalyticsTab({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('الإحصائيات والتقدم'), backgroundColor: const Color(0xFF6C3FD9), centerTitle: true),
+      body: const Padding(
+        padding: EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            Card(
+              child: ListTile(
+                leading: Icon(Icons.check_circle, color: Colors.green),
+                title: Text('إجمالي ساعات المذاكرة اليوم'),
+                subtitle: Text('2 ساعة و 15 دقيقة'),
+              ),
+            ),
+            Card(
+              child: ListTile(
+                leading: Icon(Icons.block, color: Colors.red),
+                title: Text('محاولات التشتت الممنوعة'),
+                subtitle: Text('3 محاولات'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
